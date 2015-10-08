@@ -1,0 +1,20 @@
+﻿@{
+    Layout = null;
+}
+@using ThinkGeo.MapSuite.MvcEdition;
+@using ThinkGeo.MapSuite.Core  ;
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div id="map">
+        @{Html.ThinkGeo().Map(ViewBag.data).OnClientClick("ClickEvent").Render();
+        }
+    </div> 
+</body>
+</html>

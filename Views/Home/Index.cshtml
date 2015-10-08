@@ -1,0 +1,1538 @@
+﻿
+@model NDV.Models.UserMessage
+@using ThinkGeo.MapSuite.MvcEdition;
+@using ThinkGeo.MapSuite.Core;
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>National Data Visualization</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/CSS/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="/CSS/StyleSheet1.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/CSS/full-slider.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="~/JS/jquery.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="~/JS/bootstrap.min.js"></script>
+    <!-- Script to Activate the Carousel -->
+    <script>
+        $('.carousel').carousel({
+            interval: 5000 //changes the speed
+        })
+    </script>
+
+    <!-- Custom Fonts -->
+    <link href="/font-awesome-4.3.0/font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+    <script src="~/JS/jquery-ui.min.js"></script>
+    <script src="~/JS/jquery-1.11.3.js"></script>
+
+    <script src="/sweetalert-master/dist/sweetalert.min.js"></script>
+    <script src="~/JS/jquery-ui.min.js"></script>
+    <script src="~/JS/jquery-1.11.3.js"></script>
+    <link href="~/JS/morris.css" rel="stylesheet" />
+    <script src="~/JS/morris.min.js"></script>
+    <script src="~/JS/morris.js"></script>
+    <script src="~/JS/prettify.js"></script>
+    <script src="~/JS/rapheal.js"></script>
+    <script src="~/JS/example.js"></script>
+
+    @*<link href="~/CSS/examples.css" rel="stylesheet" />
+    <script src="~/JS/jquery.js"></script>
+    <script src="~/JS/jquery.flot.js"></script>
+    <script src="~/JS/jquery.flot.crosshair.js"></script>
+    <script src="~/JS/jquery.flot.selection.js"></script>*@
+    <!-- For Dropdown Menu  -->
+    <script>
+        jQuery(document).ready(function () {
+            $("#prov").on("change", function () {
+
+                var x = $(this).val();
+                var data = {};
+                data.Province_ID = $(this).val();
+                data.District_Name = $(this).text();
+                alert(data.Province_ID);
+                alert(data.District_Name);
+                $.ajax({
+                    url: "/Home/provinceToDistrict",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "JSON",
+                    contentType: "Application/JSON",
+                    async: true,
+                    success: function (d) {
+                        $('#dist').html('');
+                        for (var i = 0; i < d.Result1.length; i++) {
+                            if (i == 0) {
+                                $('#dist').append('<option value="" disabled selected>Select District</option>');
+                            }
+                            var obj1 = d.Result1[i];
+                            var obj2 = d.Result2[i];
+
+                            $('#dist').append($('<option>', {
+                                value: obj2,
+                                text: obj1
+                            }));
+                        }
+                    }
+                });
+            });
+
+            $("#dist").on("change", function () {
+
+                var x2 = $(this).val();
+
+                var data = {};
+                data.District_ID = $(this).val();
+                data.Tehsil_Name = $(this).text();
+
+                $.ajax({
+                    url: "/Home/districtToTehsil",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "JSON",
+                    contentType: "Application/JSON",
+                    async: true,
+                    success: function (d) {
+                        $('#teh').html('');
+                        for (var i = 0; i < d.Result1.length; i++) {
+                            if (i == 0) {
+                                $('#teh').append('<option value="" disabled selected>Select Tehsil</option>');
+                            }
+                            var obj1 = d.Result1[i];
+                            var obj2 = d.Result2[i];
+
+                            $('#teh').append($('<option>', {
+                                value: obj2,
+                                text: obj1
+                            }));
+                        }
+                    }
+                });
+            });
+
+            $("#teh").on("change", function () {
+                var x3 = $(this).val();
+
+                var data = {};
+                data.Tehsil_ID = $(this).val();
+                data.Town_Name = $(this).text();
+
+                $.ajax({
+                    url: "/Home/tehsilToTown",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "JSON",
+                    contentType: "Application/JSON",
+                    async: true,
+                    success: function (d) {
+                        $('#twn').html('');
+                        for (var i = 0; i < d.Result1.length; i++) {
+                            if (i == 0) {
+                                $('#twn').append('<option value="" disabled selected>Select Town</option>');
+                            }
+                            var obj1 = d.Result1[i];
+                            var obj2 = d.Result2[i];
+
+                            $('#twn').append($('<option>', {
+                                value: obj2,
+                                text: obj1
+                            }));
+                        }
+                    }
+                });
+            });
+
+            $("#att").on("change", function () {
+
+                var y = $(this).val();
+
+                var data = {};
+                data.Attribute_ID = $(this).val();
+                data.Attribute_Name = $(this).text();
+
+                $.ajax({
+                    url: "/Home/changeAttribute",
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "JSON",
+                    contentType: "Application/JSON",
+                    async: true,
+                    success: function (d) {
+
+                        var data0 = d[0];
+                        var data1 = d[1];
+                        var data2 = d[2];
+                        var data3 = d[3];
+                        var data4 = d[4];
+                        var data5 = d[5];
+                        var data6 = d[6];
+                        //------------------------------------------------------
+
+                        var text = document.getElementById('att').options[document.getElementById('att').selectedIndex].text;
+
+                        var arr0 = new Array();
+
+                        //var line = new String();
+                        //line = "";
+                        //for (var c = 0; c < data0.length; c++) {
+
+                        //    line = line + "{ y : " + data0[c];
+                        //    //alert(line);
+                        //    for (var d = 0; d < data1.length; d++) {
+                        //        line  = line + ", " + data1[d] + ":";
+                        //        line = line + data2[d];
+
+                        //    }
+                        //    line = line + " }"
+
+                        //    alert(line);
+                        //    arr0.push(line);
+                        //    line = "";
+                        //}
+                        //arr0.push(JSON.stringify(line));
+                        //----------------------------
+                        //alert(arr0);
+
+                        //var ob = new Object();
+                        //ob = [arr0];
+                        //    var dd = [
+                        // { y: 2007, a: 90, b: 65, c: 50, d: 70, e: 90, f: 21, g: 50 },
+                        // { y: 2008, a: 50, b: 40, c: 90, d: 70, e: 87, f: 10, g: 45 },
+                        // { y: 2009, Punjabi: 75, Sindhi: 65, Pushto: 90, Balochi: 70, Saraiki: 31, Urdu: 57, Others: 35 },
+                        // { y: 2010, Punjabi: 50, Sindhi: 40, Pushto: 90, Balochi: 70, Saraiki: 45, Urdu: 85, Others: 57 },
+                        // { y: 2011, Punjabi: 75, Sindhi: 65, Pushto: 90, Balochi: 70, Saraiki: 87, Urdu: 66, Others: 34 },
+                        // { y: 2012, Punjabi: 100, Sindhi: 90, Pushto: 90, Balochi: 70, Saraiki: 30, Urdu: 49, Others: 78 }
+                        //];
+                        //    alert(ob);
+                        //    alert(JSON.parse(dd));
+
+                        for (var c = 0; c < data0.length; c++) {
+                            var abc = {};
+                            abc.y = data0[c];
+
+                            if (c == 0) {
+                                abc.a = data2[0];
+                                abc.b = data2[1];
+                                abc.c = data2[2];
+                                abc.d = data2[3];
+                                abc.e = data2[4];
+                                abc.f = data2[5];
+                                abc.g = data2[6];
+                            }
+                            if (c == 1) {
+                                abc.a = data4[0];
+                                abc.b = data4[1];
+                                abc.c = data4[2];
+                                abc.d = data4[3];
+                                abc.e = data4[4];
+                                abc.f = data4[5];
+                                abc.g = data4[6];
+                            }
+                            if (c == 2) {
+                                abc.a = data6[0];
+                                abc.b = data6[1];
+                                abc.c = data6[2];
+                                abc.d = data6[3];
+                                abc.e = data6[4];
+                                abc.f = data6[5];
+                                abc.g = data6[6];
+                            }
+
+                            arr0.push(abc);
+                        }
+                        $("#s1").html("<h2>Line Chart For " + text + "</h2>");
+                        $("#shery1").html("");
+
+                        Morris.Line({
+                            element: 'shery1',
+
+                            data: arr0,
+
+                            xkey: 'y',
+                            ykeys: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+                            labels: [data1[0], data1[1], data1[2], data1[3], data1[4], data1[5], data1[6]],
+                            pointSize: [1],
+                            hideHover: ['always'],
+
+                        });
+                        //------------------------------------------------------
+                        var arr = new Array();
+
+                        for (var c = 0; c < data1.length; c++) {
+                            var abc = {};
+                            abc.value = data2[c];
+                            abc.label = data1[c];
+                            arr.push(abc);
+                        }
+                        //----------------------------
+
+                        $("#s2").html("<p>" + text + " %age In 2007</p>");
+                        $("#shery2").html("");
+                        Morris.Donut({
+                            element: 'shery2',
+
+                            data: arr,
+                            formatter: function (x) { return x + "%" }
+                        }).on('click', function (i, row) {
+                            console.log(i, row);
+                        });
+                        //------------------------------------------------------
+                        var arr2 = new Array();
+
+                        for (var c = 0; c < data1.length; c++) {
+                            var abc = {};
+                            abc.x = data1[c];
+                            abc.y = data2[c];
+
+                            arr2.push(abc);
+                        }
+                        //---------------------------
+
+                        $("#s3").html("<p>" + text + " %age In 2007</p>");
+                        $("#shery3").html("");
+                        Morris.Bar({
+                            element: 'shery3',
+                            data: arr2,
+                            xkey: "x",
+                            ykeys: ["y"],
+                            labels: ['%age'],
+                            barColors: function (row, series, type) {
+                                if (type == 'bar') {
+                                    var red = Math.ceil(255 * row.y / this.ymax);
+                                    return 'rgb(' + red + ',0,0)';
+                                }
+                                else {
+                                    return '#000';
+                                }
+                            }
+                        });
+                        //------------------------------------------------------
+                        var arr01 = new Array();
+                        for (var c = 0; c < data0.length; c++) {
+                            var abc = {};
+                            abc.x = data0[c];
+
+                            if (c == 0) {
+                                abc.a = data2[0];
+                                abc.b = data2[1];
+                                abc.c = data2[2];
+                                abc.d = data2[3];
+                                abc.e = data2[4];
+                                abc.f = data2[5];
+                                abc.g = data2[6];
+                            }
+                            if (c == 1) {
+                                abc.a = data4[0];
+                                abc.b = data4[1];
+                                abc.c = data4[2];
+                                abc.d = data4[3];
+                                abc.e = data4[4];
+                                abc.f = data4[5];
+                                abc.g = data4[6];
+                            }
+                            if (c == 2) {
+                                abc.a = data6[0];
+                                abc.b = data6[1];
+                                abc.c = data6[2];
+                                abc.d = data6[3];
+                                abc.e = data6[4];
+                                abc.f = data6[5];
+                                abc.g = data6[6];
+                            }
+                            arr01.push(abc);
+                        }
+                        //------------------------------------------------------
+
+                        $("#s4").html("<p>" + text + " %age VS Years</p>");
+                        $("#shery4").html("");
+                        Morris.Bar({
+                            element: 'shery4',
+                            axes: false,
+
+                            data: arr01,
+
+                            xkey: 'x',
+                            ykeys: ['y', 'a', 'b', 'c', 'd', 'e', 'f'],
+                            labels: ['Y', data1[0], data1[1], data1[2], data1[3], data1[4], data1[5]]
+                        });
+                        //------------------------------------------------------
+
+                        $("#s5").html("<p>" + text + " %age VS Years</p>");
+                        $("#shery5").html("");
+                        Morris.Area({
+                            element: 'shery5',
+                            axes: false,
+
+                            data: arr01,
+
+                            xkey: 'x',
+                            ykeys: ['y', 'a', 'b', 'c', 'd', 'e', 'f'],
+                            labels: ['Y', data1[0], data1[1], data1[2], data1[3], data1[4], data1[5]]
+                        });
+                        //------------------------------------------------------
+                    }
+                });
+
+            });
+        });
+    </script>
+
+    <!-- For Comment -->
+    <script>
+        jQuery(document).ready(function () {
+            //$("#cmnt").on('click', function () {
+            //    $(".cmm").attr('type', 'text');
+            //});
+            //$("#cmnt2").on('click', function () {
+            //    $(".cmm2").attr('type', 'text');
+            //});
+            $('#qaz').bind("enterKey", function (e) {
+                alert("Enter Pressed");
+                //do stuff here
+            });
+            $('#qaz').keyup(function (e) {
+                if (e.keyCode == 13) {
+                    $(this).trigger("enterKey");
+                }
+            });
+            jQuery('.tabs .tab-links a').on('click', function (e) {
+                var currentAttrValue = jQuery(this).attr('href');
+
+                // Show/Hide Tabs
+                jQuery('.tabs ' + currentAttrValue).show().siblings().hide();
+
+                // Change/remove current tab to active
+                jQuery(this).parent('li').addClass('active').siblings().removeClass('active');
+
+                e.preventDefault();
+            });
+        });
+
+        
+
+        $("#file").change(function () { selectFileClick(); });
+
+        function selectFileClick() {
+            var fileName = filedialog();
+            // parsing file...
+            return false;
+        }
+    </script>
+
+    <!--   For Map   -->
+    <script>
+        function initialize() {
+            var mapProp = {
+                center: new google.maps.LatLng(31, 70),
+                zoom: 5,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+            var marker = google.map.marker({
+                position: mapProp,
+                map: map,
+                title: 'Pakistan'
+            });
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
+</head>
+
+<body id="page-top" class="index" style="background-color:burlywood">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">National Data Visualization</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#page-top">Home</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#services">Service</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#info">Submit Info</a>
+                    </li>
+                    @*<li>
+                        <a class="page-scroll" href="#graph">Graphs</a>
+                    </li>*@
+                    <li>
+                        <a class="page-scroll" href="#AllPosts">News Feed</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#mypost">Posts</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#profile">History</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#contact">Contact Us</a>
+                    </li>
+                    <li class="dropdown user user-menu ">
+                        <!-- Menu Toggle Button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <!-- The user image in the navbar-->
+                            <img src="~/Images/user.png" class="user-image" alt="User Image" />
+                            <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                            @*<span class="hidden-xs">@Session["UN"]</span>*@
+                        </a>
+                        <ul class="dropdown-menu img-centered">
+                            <!-- The user image in the menu -->
+                            <li class="user-header ">
+                                <div style="padding:20px">
+                                    <img src="~/Images/user1.png" class="img-circle " alt="User Image" /><br />
+                                    <p style="color:darkviolet">
+                                        <br />
+                                        @Session["UN"] - Registered Member of National Data Center
+                                    </p>
+                                </div>
+                            </li>
+                            <!-- Menu Body -->
+                            <li class="user-body" style="width:180px; ">
+
+                            </li>
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div style="padding:8px">
+                                    <div class="pull-left">
+                                        <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
+                                            <div class="portfolio-hover">
+                                                <div class="portfolio-hover-content">
+                                                    <i class="fa fa-plus fa-2x"></i>
+                                                </div>
+                                            </div>
+                                            Edit
+                                        </a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="/Home/HomePage" class="portfolio-link" data-toggle="modal">
+                                            <div class="portfolio-hover">
+                                                <div class="portfolio-hover-content">
+                                                    <i class="fa fa-sign-out fa-2x"></i>
+                                                </div>
+                                            </div>
+                                            LOGOUT
+                                        </a>
+                                        @*<a class="portfolio-link" style="color:brown" href="/Home/HomePage"> LOGOUT</a>*@
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Full Page Image Background Carousel Header -->
+    <header id="myCarousel" class="carousel slide">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Wrapper for Slides -->
+        <div class="carousel-inner">
+            <div class="item active">
+                <!-- Set the first background image using inline CSS below. -->
+                <div class="fill" style="background-image: url(/Images/Globe.jpg);"></div>
+                <div class="container">
+                    <div class="intro-text">
+
+                        <div class="intro-lead-in">It's All About The Stats Of</div>
+                        <div class="intro-heading">PAKISTAN</div>
+                    </div>
+                </div>
+                <div class="carousel-caption">
+                    <h1>It's All About The Stats Of</h1>
+                    <h1 class="intro-heading">PAKISTAN</h1>
+                    <br /><br /><br /><br /><br /><br /><br /><br />
+                </div>
+            </div>
+            <div class="item">
+                <!-- Set the second background image using inline CSS below. -->
+                <div class="fill" style="background-image: url(/Images/bbkk.jpg);"></div>
+                <div class="carousel-caption">
+
+                </div>
+            </div>
+            <div class="item">
+                <!-- Set the third background image using inline CSS below. -->
+                <div class="fill" style="background-image: url(/Images/bkbk.jpg);"></div>
+                <div class="carousel-caption">
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+
+    </header>
+
+    <!-- Services Section -->
+    <section id="services" style="background-image:url(/Images/bg4.jpg)">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading" style="color: lightblue">Services</h2>
+                    <h3 class="section-subheading text-muted" style="color: lightblue">Stats of Pakistan</h3>
+                    
+                </div>
+            </div>
+
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h4 style="color: lightblue; font-family: Jokerman; font-size: 30px" class="service-heading"><b><i>PAKISTAN</i></b></h4>
+                    <hr /><br />
+                    <form>
+                        <b><i style="color: lightblue">Province:</i></b>
+                        <select id="prov" class="badge">
+                            <option value="" disabled selected>Select Province</option>
+                            <option value="1">Punjab</option>
+                            <option value="2">Sindh</option>
+                            <option value="3">Balochistan</option>
+                            <option value="4">NWFP</option>
+                            <option value="5">FATA</option>
+                        </select>
+                        <br /><br />
+                        <b><i style="color: lightblue">District:</i></b>
+                        <select id="dist" class="badge">
+                            <option value="" disabled selected>Select District</option>
+                        </select>
+                        <br /><br />
+                        <b><i style="color: lightblue">Tehsil:</i></b>
+                        <select id="teh" class="badge">
+                            <option value="" disabled selected>Select Tehsil</option>
+                        </select>
+                        @*<br /><br />
+                        <b><i style="color: lightblue">Town:</i></b>
+                        <select id="twn" class="badge">
+                            <option value="" disabled selected>Select Town</option>
+                        </select>*@
+                        <br /><br />
+                            <b><i style="color: lightblue">UC:</i></b>
+                            <select id="uc" class="badge">
+                                <option value="" disabled selected>Select UC</option>
+                            </select>
+                        <br /><br />
+                        <b><i style="color: lightblue">Attribute:</i></b>
+                        <select id="att" class="badge">
+                            <option value="" disabled selected>Select Attribute</option>
+                            <option value="1">Population</option>
+                            <option value="2">Religion</option>
+                            <option value="3">Language</option>
+                            <option value="4">Literacy</option>
+                            <option value="5">University</option>
+                            <option value="6">College</option>
+                            <option value="7">Education</option>
+                            <option value="8">Mosque</option>
+                        </select>
+                        <br /><br />
+                    </form>
+                </div>
+                <div id="graphArea" class="col-md-8">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active"><a href="#pop" role="tab" data-toggle="tab">Line Chart</a></li>
+                        <li><a href="#lit" role="tab" data-toggle="tab">Donut Chart</a></li>
+                        <li><a href="#acc" role="tab" data-toggle="tab">Bar Rate</a></li>
+                        <li><a href="#sch" role="tab" data-toggle="tab">Group_Bar Chart</a></li>
+                        <li><a href="#last" role="tab" data-toggle="tab">Area Chart</a></li>
+                        <li><a href="#mapie" role="tab" data-toggle="tab">Pakistan Map</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="pop" class="tab-pane active">
+                            <br />
+                            <div id="s1"></div>
+                            <div id="shery1" style="height:300px; width:600px">
+
+                            </div>
+                        </div>
+                        <div id="lit" class="tab-pane">
+                            <br />
+                            <div id="s2"></div>
+                            <div id="shery2" style="height:300px; width:600px">
+
+                            </div>
+                        </div>
+                        <div id="acc" class="tab-pane">
+                            <br />
+                            <div id="s3"></div>
+                            <div id="shery3" style="padding-left:50px; height:300px; width:550px">
+
+                            </div>
+                        </div>
+                        <div id="sch" class="tab-pane">
+                            <br />
+                            <div id="s4"></div>
+                            <div id="shery4" style="padding-left: 50px; height: 300px; width: 550px">
+
+                            </div>
+                        </div>
+                        <div id="last" class="tab-pane">
+                            <br />
+                            <div id="s5"></div>
+                            <div id="shery5" style="padding-left: 50px; height: 300px; width: 550px">
+
+                            </div>
+                        </div>
+                        <div id="mapie" class="tab-pane">
+                            <br />
+                            <div id="s6"></div>
+                            <div id="shery6" style="padding-left: 50px; height: 300px; width: 550px">
+                                @*<div id="map">
+                                    @{Html.ThinkGeo().Map(ViewBag.data).OnClientClick("ClickEvent").Render();
+                                    }
+                                </div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section id="info" class="bg-darkest-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading" style="color:white">Input Information</h2>
+                    <h3 class="section-subheading text-muted" style="color:white">Provide us a useful information about your area</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="/Images/population.jpg" style="width:350px; height:180px" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4 style ="color:white">Population Rate</h4>
+                        <p class="text-muted">---------------</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="/Images/literacy.jpg" style="width:350px; height:180px" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4 style="color:white">Education Rate</h4>
+                        <p class="text-muted">---------------------</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal3" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="/Images/info.jpg" style="width:350px; height:180px" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4 style="color:white">Other Basic Information</h4>
+                        <p class="text-muted">----------------</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    
+    <!-- News Feed Section -->
+    <section id="AllPosts" style="background-image: url(/Images/bg4.jpg)">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading" style="color: lightblue">News Feed</h2>
+                    <h3 class="section-subheading text-muted">What Kind of Stuff People Posts There..</h3>
+                </div>
+            </div>
+            <div style="border:ridge; background-image:url(/Images/bg3.jpg)" class="row">
+                <br />
+                <div class="col-lg-offset-2 col-lg-8">
+                    @foreach (var d in ViewBag.Alldata)
+                    {
+                        <div style="border: ridge; padding: 50px; background-image: url(/Images/bg8.jpg)">
+                            <span>
+                                <img src="~/Images/user.png" />
+                                @{
+                        NDV.Models.NDVEntities1 db = new NDV.Models.NDVEntities1();
+                        int x = (int)d.User_ID;
+                        int y = (int)d.Id;
+
+                        NDV.Models.User_Info ui = db.User_Info.First(a => a.User_ID == x);
+                        var cm = (from x1 in db.Coments
+                                  where x1.Post_ID == y
+                                  select x1).ToList();
+                                }
+                                <span style="color: chocolate">@ui.User_Name</span>
+                            </span>
+
+                            <div>
+                                <h3 class="section-subheading text-muted" style="color:white">
+                                    @d.Problem
+                                </h3>
+                                <hr />
+                                <div>
+                                    <ul class="list-inline">
+                                        <li>
+                                            <button class="btn btn-warning" id="lk"><i class="fa fa-thumbs-o-up"></i>   Like</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn btn-warning" id="dlk"><i class="fa fa-thumbs-o-down"></i>   Dislike</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn btn-warning" id="cmnt"><i class="fa fa-comments-o"></i>   Comment</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <hr />
+                                <p id="coments"></p>
+                                <div>
+                                    @foreach (var dd in cm)
+                                    {
+                                        <div>
+                                            @{
+                                                NDV.Models.NDVEntities1 db1 = new NDV.Models.NDVEntities1();
+                                                NDV.Models.User_Info com_nam = db1.User_Info.First(v => v.User_ID == dd.User_ID);
+                                            }
+                                        </div>
+                                        <span><b>@com_nam.User_Name</b><p style="color:white">@dd.Coment_Text</p></span>
+                                    }
+
+                                </div>
+                                <input class="cmm form-control" placeholder="Write a comment..." />
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                        <br />
+                    }
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Post Section -->
+    <section id="mypost" class="bg-darkest-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center ">
+                    <h2 class="section-heading" style="color:white">Posts</h2>
+                    <h3 class="section-subheading text-muted " style="color: white">You Can Upload Useful Stuff About Pakistan Stats.</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-offset-2 col-lg-8">
+                    <div class="tabs">
+                        <ul class="tab-links">
+                            <li class="active"><a href="#tab1"><i class="fa fa-pencil-square-o"></i>  Write Post</a></li>
+                            <li><a href="#tab2"><i class="fa fa-file-image-o"></i>  Add Photo/Video</a></li>
+                            <li><a href="#tab3"><i class="fa fa-file-excel-o"></i>  Add File</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="tab1" class="tab active">
+                                <form id="post1" method="post" action="/Home/saveProblemPost">
+                                    <p>About Pakistan</p><br />
+                                    <textarea class="form-control" name="msg1" id="t1" placeholder="Write Something..."></textarea><br />
+                                    <input class="btn-success" type="submit" id="upload1" value="Post" /><br />
+                                </form>
+                            </div>
+
+                            <div id="tab2" class="tab">
+                                <form id="post2" action="">
+                                    <p>Upload Photo or Video here!</p><br />
+                                    <textarea class="form-control" id="t2" placeholder="Write Something..."></textarea><br />
+                                    <input id="file" type="file" /><br />
+                                    <input class="btn-success" type="submit" id="upload1" value="Upload" /><br />
+                                </form>
+                            </div>
+
+                            <div id="tab3" class="tab">
+                                <form id="post3" action="">
+                                    <p>Upload Files..</p><br />
+                                    <textarea class="form-control" id="t3" placeholder="Write Something..."></textarea><br />
+                                    <input id="file" type="file"><br />
+                                    <input class="btn-success" type="submit" id="upload1" value="Upload" /><br />
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" style="background-image: url(/Images/bg4.jpg)">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center ">
+                    <h2 class="section-heading" style="color: lightblue">History</h2>
+                    <h3 class="section-subheading text-muted">All Of Your Posts Here..</h3>
+                </div>
+            </div>
+            <div style="border:ridge; background-image:url(/Images/bg3.jpg)" class="row">
+                <br />
+                <div class="col-lg-offset-2 col-lg-8">
+                    @foreach (var l in ViewBag.data)
+                    {
+                        <div style="border: ridge; padding: 50px; background-image: url(/Images/bg8.jpg)">
+                            <div>
+                                <span>
+                                    <img src="~/Images/user.png" />
+                                    <span style="color: chocolate">@ViewBag.uname</span>
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="section-subheading text-muted">
+                                    @l.Problem
+                                </h3>
+                                <hr />
+                                <div>
+                                    <ul class="list-inline">
+                                        <li>
+                                            <button class="btn btn-warning" id="lk"><i class="fa fa-thumbs-o-up"></i>   Like</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn btn-warning" id="dlk"><i class="fa fa-thumbs-o-down"></i>   Dislike</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn btn-warning" id="cmnt2"><i class="fa fa-comments-o"></i>   Comment</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <hr />
+                                <p id="coments"></p>
+                                <input id="qaz" class="cmm2 form-control" placeholder="Write a comment..." />
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                        <br />
+                    }
+                </div>
+
+                <!-- 1st Post -->
+                @*<div class="col-lg-offset-2 col-lg-8">
+                <div>
+                    <span>
+                        <img src="~/Images/user.png" />
+                        <span style="color: chocolate">Hamza Shafique</span>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="section-subheading text-muted">
+                        When you are greeted with a greeting, greet in return with what is better than it, or (at least) return it equally. Certainly, Allah is Ever a Careful Account Taker of all things.<br />
+                        ‪#‎An_Nisa‬ ‪#‎Verse_86‬
+                    </h3>
+                    <hr />
+                    <div>
+                        <ul class="list-inline">
+                            <li>
+                                <button class="btn btn-warning" id="lk" ><i class="fa fa-thumbs-o-up"></i>   Like</button>
+                            </li>
+                            <li>
+                                <button class="btn btn-warning" id="dlk"><i class="fa fa-thumbs-o-down"></i>   Dislike</button>
+                            </li>
+                            <li>
+                                <button id="cmnt" class="btn btn-warning"><i class="fa fa-comments-o"></i>   Comment</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr />
+                    <p id="coments"></p>
+                    <input id="cmm" class="form-control" type="hidden" placeholder="Write a comment..." />
+                    <br />
+                    <br />
+                </div>
+
+            </div>*@
+                <br />
+
+                <!-- 2nd Post -->
+                @*<div class="col-lg-offset-2 col-lg-8">
+                <div>
+                    <span>
+                        <img src="~/Images/user.png" />
+                        <span style="color: chocolate">Hamza Shafique</span>
+                    </span>
+                </div>
+                <div>
+                    <br />
+                        <img src="~/Images/image7.png" />
+                    <hr />
+                    <div>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="#"><i class="fa fa-thumbs-o-up fa-2x"><span>Like</span></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-thumbs-o-down fa-2x">Dislike</i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-comments-o fa-2x">Comment</i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr />
+                    <p id="coments"></p>
+                    <input id="cmm" class="form-control" type="text" placeholder="Write a comment..." />
+                </div>
+
+            </div>*@
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Contact Us</h2>
+                    <h3 class="section-subheading text-muted">For any other information contact us freely.</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div style="padding-left:180px">
+                        <h2 style="color:gray">Send Us A Message</h2><br />
+                    </div>
+                    <form name="sentMessage" id="contactForm" method="post" action="/Home/SaveMessages" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Your Name *" name="un" id="name" required data-validation-required-message="Please enter your name.">
+                                    @*@Html.TextBoxFor(model => model.Username, new { @class = "form-control", type = "text", placeholder = "Your Name" })*@
+                                    <p class="help-block text-danger"></p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" placeholder="Your Email *" name="em" id="email" required data-validation-required-message="Please enter your email address.">
+                                    @*@Html.TextBoxFor(model => model.Username, new { @class = "form-control", type = "email", placeholder = "Your Email" })*@
+                                    <p class="help-block text-danger"></p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="tel" class="form-control" placeholder="Your Phone *" name="ph" id="phone" required data-validation-required-message="Please enter your phone number.">
+                                    @*@Html.TextBoxFor(model => model.Username, new { @class = "form-control", type = "tel", placeholder = "Your Email" })*@
+                                    <p class="help-block text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 ">
+                                <div class="form-group">
+                                    <textarea class="form-control" placeholder="Your Message *" name="msg" id="message" required data-validation-required-message="Please enter a message."></textarea>
+                                    @*@Html.TextAreaFor(model => model.Message, new { @class = "form-control", placeholder = "Your Message", })*@
+                                    <p class="help-block text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-lg-12 text-center">
+                                <div id="success"></div>
+                                <button type="submit" class="btn btn-xl">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="border-left-style:double; padding-left:40px" class="col-lg-4 text-muted">
+                    <h2>National Data Center</h2>
+                    <p>
+                        <br />Address : PUCIT-Punjab University Collage Of Information Technology The Mall, Lahore.<br />
+                        <br />Email At : <a href="https://www.gmail.com">hamxxa07@gmail.com</a>
+                        <br />Phone At : <a>+92 322 5771035</a>
+                        <br />Skype At : <a href="https://www.skype.com" name="hamzi_07">Hamzi_07</a>
+                        <br />Facebook: <a href="https://www.facebook.com/hamza.shafique.904">Hamza Shafique</a>
+                        <br /><br /><br /><br />
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background-image:url(/Images/bg8.jpg)">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright">Copyright &copy; Your Website 2015</span>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-inline social-buttons">
+                        <li>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-inline quicklinks">
+                        <li>
+                            <a href="#">Privacy Policy</a>
+                        </li>
+                        <li>
+                            <a href="#">Terms of Use</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Portfolio Modal 1 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content" style="background-image:url(/Images/back.jpg)">
+            <div class="container">
+                <div class="col-lg-6 col-lg-offset-3">
+                    <div class="modal-body">
+                        <!-- Project Details Go Here -->
+                        <h2>Pakage Request</h2>
+                        <p class="item-intro text-muted">Fill In The Form With Your Desired Requirement.</p>
+
+                        <form class="form" method="post" action="/">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Request Details</h3>
+                                </div>
+                                <div class="panel-body">
+
+                                    <div class="form-group">
+                                        <label for="heading">Title</label>
+                                        <input class="form-control" data-val="true" data-val-length="Title must be between 3 and 30 characters!" data-val-length-max="50" data-val-length-min="3" data-val-required="Title is required" id="title" name="title" placeholder="eg. Hp Laptop i5" type="text" value="" />
+                                        <span class="field-validation-valid" data-valmsg-for="title" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div>
+                                        <label for="heading">Catagory</label>
+                                        <select class="form-control" id="cat" name="catagory">
+                                            <option>Real Estate</option>
+                                            <option>Vehicle</option>
+                                            <option>Computer</option>
+                                            <option>Cell Phone</option>
+                                        </select>
+                                        <br />
+                                        <span class="field-validation-valid" data-valmsg-for="cat" data-valmsg-replace="true"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="heading">Brand</label>
+                                        <input class="form-control" data-val="true" data-val-length="Brand Name must be between 3 and 50 characters!" data-val-length-max="50" data-val-length-min="3" data-val-required="Brand is required" id="brand" name="brand" placeholder="Apple, Nokia, LG" type="text" value="" />
+
+                                        <span class="field-validation-valid" data-valmsg-for="brand" data-valmsg-replace="true"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+
+
+                                        <select class="form-control" id="status" name="status">
+                                            <option selected="selected">New</option>
+                                            <option>Used</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="text">Description</label>
+                                        <textarea class="form-control" cols="20" data-val="true" data-val-length="First Name must be between 10 and 500 characters!" data-val-length-max="500" data-val-length-min="10" data-val-required="Description is required" id="description" name="description" rows="6"></textarea>
+
+                                        <span class="field-validation-valid" data-valmsg-for="description" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Price</label>
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <div class="input-group" style="width: 150px;">
+                                                    <input class="form-control" data-val="true" data-val-length="Price must be between 100 and 10 Million !" data-val-length-max="8" data-val-length-min="3" data-val-required="Price is required" id="price" name="price" type="number" value="" />
+                                                    <span class="input-group-addon">PKR</span>
+                                                </div>
+                                                <span class="field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="well">
+                                <p>Click Here To Submit Request.</p>
+                                <button type="submit" class="btn btn-success">Submit Request</button>
+                                <button type="submit" class="btn btn-warning" data-dismiss="modal">   BACK   </button>
+
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 2 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-hidden="true">
+        <div style="background-color:lightsalmon" class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container" style="background-color:lightgray">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Edit Profile</h2>
+                            <p class="item-intro text-muted">You Can Edit Your Personal Information...</p>
+                            <span><img style="width:120px" class="img-responsive img-centered" src="~/Images/user1.png" alt=""><h3>   Hamza Shafique</h3></span>
+
+                            <div class="col-lg-12">
+                                <form name="register" id="contactForm" method="post" action="/Home/GetRegistered" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="First Name *" name="fname" id="fname" required data-validation-required-message="Please enter your first name.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="email" disabled class="form-control" placeholder="hamxxa07@gmail.com" name="email" id="email" required data-validation-required-message="Please enter your email address.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="tel" class="form-control" placeholder="Your Phone *" name="gender" id="gender" required data-validation-required-message="Please enter your phone number.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="Your CNIC No *" name="cnic" id="cnic" required data-validation-required-message="Please enter your cnic.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                Gender :
+                                                <input class="form-group" type="radio" name="gender"> Male
+                                                <input class="form-group" type="radio" name="gender"> Female
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                Date Of Birth:
+
+                                                <select style="height:30px" name="date">
+                                                    <option value="" disabled selected>Date</option>
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                    <option>8</option>
+                                                    <option>9</option>
+                                                    <option>10</option>
+                                                    <option>11</option>
+                                                    <option>12</option>
+                                                    <option>13</option>
+                                                    <option>14</option>
+                                                    <option>15</option>
+                                                    <option>16</option>
+                                                    <option>17</option>
+                                                    <option>18</option>
+                                                    <option>19</option>
+                                                    <option>20</option>
+                                                    <option>21</option>
+                                                    <option>22</option>
+                                                    <option>23</option>
+                                                    <option>24</option>
+                                                    <option>25</option>
+                                                    <option>26</option>
+                                                    <option>27</option>
+                                                    <option>28</option>
+                                                    <option>29</option>
+                                                    <option>30</option>
+                                                    <option>31</option>
+                                                </select>
+
+                                                <select style="height:30px" name="month">
+                                                    <option value="" disabled selected>Month</option>
+                                                    <option>January</option>
+                                                    <option>February</option>
+                                                    <option>March</option>
+                                                    <option>April</option>
+                                                    <option>May</option>
+                                                    <option>June</option>
+                                                    <option>July</option>
+                                                    <option>August</option>
+                                                    <option>September</option>
+                                                    <option>October</option>
+                                                    <option>November</option>
+                                                    <option>December</option>
+                                                </select>
+                                                <select style="height:30px" name="year">
+                                                    <option value="" disabled selected>Year</option>
+                                                    <option>1990</option>
+                                                    <option>1991</option>
+                                                    <option>1992</option>
+                                                    <option>1993</option>
+                                                    <option>1994</option>
+                                                    <option>1995</option>
+                                                    <option>1996</option>
+                                                    <option>1997</option>
+                                                    <option>1998</option>
+                                                    <option>1999</option>
+                                                    <option>2000</option>
+                                                    <option>2001</option>
+                                                    <option>2002</option>
+                                                    <option>2003</option>
+                                                    <option>2004</option>
+                                                    <option>2005</option>
+                                                    <option>2006</option>
+                                                    <option>2007</option>
+                                                    <option>2008</option>
+                                                    <option>2009</option>
+                                                    <option>2010</option>
+                                                    <option>2011</option>
+                                                    <option>2012</option>
+                                                    <option>2013</option>
+                                                    <option>2014</option>
+                                                    <option>2015</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="Last Name *" name="lname" id="lname" required data-validation-required-message="Please enter your last name.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="email" class="form-control" placeholder="New Password *" name="pswd" id="password" required data-validation-required-message="Please enter your password.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="tel" class="form-control" placeholder="Address *" name="ph" id="phone" required data-validation-required-message="Please enter your address.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="Your Job *" name="job" id="job" required data-validation-required-message="Please enter your phone number.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control" name="qualification" required data-validation-required-message="Please select your qualification.">
+                                                    <option value="" disabled selected>Qualification</option>
+                                                    <option>Primary</option>
+                                                    <option>Middle</option>
+                                                    <option>Matric</option>
+                                                    <option>Intermediate</option>
+                                                    <option>Bachelor</option>
+                                                    <option>MPhill</option>
+                                                    <option>Phd</option>
+                                                </select>
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="Your Location *" name="loc" id="location" required data-validation-required-message="Please enter your phone number.">
+                                                <p class="help-block text-danger"></p>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <div class="col-lg-12 text-center">
+                                            <div id="success"></div>
+                                            @*<button type="submit" class="btn btn-xl">Sign Up</button>*@
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <button id="saveChanges" type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-save"></i> SAVE PROFILE </button>
+                            <button id="discardChanges" type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> CANCEL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 3 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <!-- Project Details Go Here -->
+                            <h2>Project Name</h2>
+                            <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
+                            <img class="img-responsive img-centered" src="img/portfolio/treehouse-preview.png" alt="">
+                            <p>Treehouse is a free PSD web template built by <a href="https://www.behance.net/MathavanJaya">Mathavan Jaya</a>. This is bright and spacious design perfect for people or startup companies looking to showcase their apps or other projects.</p>
+                            <p>You can download the PSD template in this portfolio sample item at <a href="http://freebiesxpress.com/gallery/treehouse-free-psd-web-template/">FreebiesXpress.com</a>.</p>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close Project</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 4 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-hidden="true">
+        <div style="background-color:lightsalmon" class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container" style="background-color:lightgray">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>View Profile</h2>
+                            <p class="item-intro text-muted">All Your Personal Information Here...</p>
+                            <span><img style="width:120px" class="img-responsive img-centered" src="~/Images/user1.png" alt=""><h3>   Hamza Shafique</h3></span>
+
+                            <div class="col-lg-12">
+                                <form name="register" id="contactForm" method="post" action="/Home/GetRegistered" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                First Name : Hamza
+                                            </div>
+                                            <div class="form-group">
+                                                Email : hamxxa07@gmail.com
+                                            </div>
+                                            <div class="form-group">
+                                                Phone No : 0322 5771035
+                                            </div>
+                                            <div class="form-group">
+                                                CNIC No : 35201-5634304-7
+                                            </div>
+                                            <div class="form-group">
+                                                Gender : Male
+                                            </div>
+                                            <div class="form-group">
+                                                Date Of Birth : 4th of July, 1994
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                Last Name : Shafique
+                                            </div>
+                                            <div class="form-group">
+                                                Password : (***) Hidden
+                                            </div>
+                                            <div class="form-group">
+                                                Addres : Nishter Colony Lahore, Punjab, Pakistan
+                                            </div>
+                                            <div class="form-group">
+                                                Job : Dot Net Developer
+                                            </div>
+                                            <div class="form-group">
+                                                Qualification : BS I.T
+                                            </div>
+                                            <div class="form-group">
+                                                Location : Lahore, Pakistan
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="/JS/jquery-1.11.3.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/JS/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="/JS/classie.js"></script>
+    <script src="/JS/cbpAnimatedHeader.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="/JS/jqBootstrapValidation.js"></script>
+    <script src="/JS/contact_me.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/JS/agency.js"></script>
+    
+</body>
+
+</html> 
